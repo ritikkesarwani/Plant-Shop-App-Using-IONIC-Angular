@@ -1,0 +1,7 @@
+{
+  "name": "plant-shop",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
