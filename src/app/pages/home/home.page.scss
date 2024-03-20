@@ -1,0 +1,36 @@
+.custom-content {
+  --background: var(--ion-color-dark) url('https://images.unsplash.com/photo-1473081556163-2a17de81fc97?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') no-repeat center center/cover;
+  padding-top: 200px;
+
+  .custom-list {
+    transform: translateY(10vh);
+    background: transparent;
+    padding: 20px;
+    border-radius: 10px;
+
+    ion-button {
+      --color: black;
+      --background: white;
+      margin-bottom: 16px;
+    }
+
+    ion-text {
+      display: block;
+      color: white;
+      margin-top: 10px;
+    }
+  }
+}
+
+.custom-logo {
+  display: block;
+  text-align: center;
+  font-size: 3em;
+  margin-bottom: 90px;
+  color: white;
+}
+
+a {
+  text-decoration: none;
+  color: whitesmoke;
+}

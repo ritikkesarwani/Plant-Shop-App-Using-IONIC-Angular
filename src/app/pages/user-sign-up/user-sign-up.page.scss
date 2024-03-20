@@ -1,0 +1,54 @@
+.login-content {
+  --background: var(--ion-color-dark) url('https://images.unsplash.com/photo-1473081556163-2a17de81fc97?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') no-repeat center center/cover;
+
+  .icon {
+    margin: 12px 0px 0px 8px;
+  }
+
+  .flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .login-card {
+    max-width: 400px;
+    width: 90%;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+
+    .card {
+      padding: 14px;
+
+      ion-item {
+        margin-bottom: 7px;
+      }
+
+      .forgot-password {
+        margin-bottom: 10px;
+        color: var(--ion-color-primary);
+      }
+
+      .login-button {
+        margin-top: 10px;
+        color: #fff;
+      }
+
+      .register-button {
+        color: black;
+        margin-left: 35px;
+        font-weight: bold;
+
+        a {
+          text-decoration: none;
+        }
+      }
+    }
+  }
+}
+
+ion-card-title {
+  text-align: center;
+  font-size: xx-large;
+}
