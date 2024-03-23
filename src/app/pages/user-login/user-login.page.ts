@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserAuthService } from 'src/app/services/user-auth/user-auth.service';
 import { NavController, ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { User } from 'src/app/Model/User.data';
 
 
 @Component({
@@ -31,6 +32,9 @@ export class UserLoginPage implements OnInit {
 
   async login(): Promise<void> {
     if (this.loginForm.valid) {
+      const user = this.loginForm.value as User;
+      localStorage.setItem('UserData', JSON.stringify(user))
+
       const username = this.loginForm.value.username;
       const password = this.loginForm.value.password;
 

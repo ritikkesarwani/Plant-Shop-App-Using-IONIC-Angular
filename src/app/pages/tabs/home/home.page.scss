@@ -54,7 +54,22 @@ ion-content {
     justify-content: center;
     align-content: center;
     margin-top: 50%;
-    margin-left: 30%;
     font-size: 1rem;
     font-weight: 200;
 }
+
+.card{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.custom-animation {
+    --duration: 2s; /* Set the duration here */
+  }
+  
+  /* Apply the animation duration to the skeleton text */
+  .custom-animation::part(animation) {
+    animation-duration: var(--duration);
+  }

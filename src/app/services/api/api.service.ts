@@ -36,7 +36,52 @@ export class ApiService {
     {id: 28, name: "Plant BB", price: 900, category: 'JAPAN', img: 'https://www.plantandflowerinfo.com/images/bromeliad-guzmania-plant2.jpg' },
     {id: 29, name: "Plant CC", price: 500, category: 'CHINA', img: 'https://www.plantandflowerinfo.com/images/aechmea-fasciata-bromeliad.jpg' },
     {id: 30, name: "Plant DD", price: 1000, category: 'INDIA', img: 'https://www.plantandflowerinfo.com/images/pothos-houseplant.jpg' },
+    {id: 31, name: "Plant EE", price: 700, category: 'INDIA', img: 'https://www.plantandflowerinfo.com/images/aechmea-fasciata-bromeliad.jpg' },
+    {id: 32, name: "Plant FF", price: 800, category: 'INDIA', img: 'https://www.plantandflowerinfo.com/images/amazon-peace-lily-plant-variegated.jpg' },
+    {id: 33, name: "Plant GG", price: 900, category: 'JAPAN', img: 'https://www.plantandflowerinfo.com/images/bromeliad-guzmania-plant2.jpg' },
+    {id: 34, name: "Plant HH", price: 500, category: 'CHINA', img: 'https://www.plantandflowerinfo.com/images/aechmea-fasciata-bromeliad.jpg' },
+    {id: 35, name: "Plant II", price: 1000, category: 'INDIA', img: 'https://www.plantandflowerinfo.com/images/pothos-houseplant.jpg' },
+    {id: 36, name: "Plant JJ", price: 700, category: 'INDIA', img: 'https://www.plantandflowerinfo.com/images/aechmea-fasciata-bromeliad.jpg' },
+    {id: 37, name: "Plant KK", price: 800, category: 'INDIA', img: 'https://www.plantandflowerinfo.com/images/amazon-peace-lily-plant-variegated.jpg' },
+    {id: 38, name: "Plant LL", price: 900, category: 'JAPAN', img: 'https://www.plantandflowerinfo.com/images/bromeliad-guzmania-plant2.jpg' },
+    {id: 39, name: "Plant MM", price: 500, category: 'CHINA', img: 'https://www.plantandflowerinfo.com/images/aechmea-fasciata-bromeliad.jpg' },
+    {id: 40, name: "Plant NN", price: 1000, category: 'INDIA', img: 'https://www.plantandflowerinfo.com/images/pothos-houseplant.jpg' },
+    {id: 41, name: "Plant OO", price: 700, category: 'INDIA', img: 'https://www.plantandflowerinfo.com/images/aechmea-fasciata-bromeliad.jpg' },
+    {id: 42, name: "Plant PP", price: 800, category: 'INDIA', img: 'https://www.plantandflowerinfo.com/images/amazon-peace-lily-plant-variegated.jpg' },
+    {id: 43, name: "Plant QQ", price: 900, category: 'JAPAN', img: 'https://www.plantandflowerinfo.com/images/bromeliad-guzmania-plant2.jpg' },
+    {id: 44, name: "Plant RR", price: 500, category: 'CHINA', img: 'https://www.plantandflowerinfo.com/images/aechmea-fasciata-bromeliad.jpg' },
+    {id: 45, name: "Plant SS", price: 1000, category: 'INDIA', img: 'https://www.plantandflowerinfo.com/images/pothos-houseplant.jpg' },
+    {id: 46, name: "Plant TT", price: 700, category: 'INDIA', img: 'https://www.plantandflowerinfo.com/images/aechmea-fasciata-bromeliad.jpg' },
+    {id: 47, name: "Plant UU", price: 800, category: 'INDIA', img: 'https://www.plantandflowerinfo.com/images/amazon-peace-lily-plant-variegated.jpg' },
+    {id: 48, name: "Plant VV", price: 900, category: 'JAPAN', img: 'https://www.plantandflowerinfo.com/images/bromeliad-guzmania-plant2.jpg' },
+    {id: 49, name: "Plant WW", price: 500, category: 'CHINA', img: 'https://www.plantandflowerinfo.com/images/aechmea-fasciata-bromeliad.jpg' },
+    {id: 50, name: "Plant Xx", price: 1000, category: 'INDIA', img: 'https://www.plantandflowerinfo.com/images/pothos-houseplant.jpg' },
+    {id: 51, name: "Plant YY", price: 700, category: 'INDIA', img: 'https://www.plantandflowerinfo.com/images/aechmea-fasciata-bromeliad.jpg' },
+    {id: 52, name: "Plant ZZ", price: 800, category: 'INDIA', img: 'https://www.plantandflowerinfo.com/images/amazon-peace-lily-plant-variegated.jpg' },
+    {id: 53, name: "Plant AAA", price: 900, category: 'JAPAN', img: 'https://www.plantandflowerinfo.com/images/bromeliad-guzmania-plant2.jpg' },
+    {id: 54, name: "Plant BBB", price: 500, category: 'CHINA', img: 'https://www.plantandflowerinfo.com/images/aechmea-fasciata-bromeliad.jpg' },
+    {id: 55, name: "Plant CCC", price: 1000, category: 'INDIA', img: 'https://www.plantandflowerinfo.com/images/pothos-houseplant.jpg' },
+    {id: 56, name: "Plant DDD", price: 700, category: 'INDIA', img: 'https://www.plantandflowerinfo.com/images/aechmea-fasciata-bromeliad.jpg' },
+    {id: 57, name: "Plant EEE", price: 800, category: 'INDIA', img: 'https://www.plantandflowerinfo.com/images/amazon-peace-lily-plant-variegated.jpg' },
+    {id: 58, name: "Plant FFF", price: 900, category: 'JAPAN', img: 'https://www.plantandflowerinfo.com/images/bromeliad-guzmania-plant2.jpg' },
+    {id: 59, name: "Plant GGG", price: 500, category: 'CHINA', img: 'https://www.plantandflowerinfo.com/images/aechmea-fasciata-bromeliad.jpg' },
+    {id: 60, name: "Plant HHH", price: 1000, category: 'INDIA', img: 'https://www.plantandflowerinfo.com/images/pothos-houseplant.jpg' },
+
+
+
+
+
+
+
+
+
+
   ]
 
   constructor() { }
+
+  getItem(id:any) {
+    const item = this.items.find(x => x.id == id);
+    return item;
+  }
 }

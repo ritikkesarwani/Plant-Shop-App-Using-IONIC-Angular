@@ -11,12 +11,16 @@ import { Keyboard } from '@capacitor/keyboard';
 })
 export class HomePage {
 
+  selectedCategory: string = ''; // Variable to store the selected category
+
+
   popularItems: any[] = [];
   loadedItemsCount = 0;
   myInput = "";
   searchQuery: string = ""; // Variable to store the search query
   moreDataAvailable: boolean = true; // Flag to indicate if more data is available
   loading: boolean = false; // Variable to indicate data loading
+  skeleton: boolean = false;
   loaderShown: boolean = true; // Flag to track whether the loader has been shown
 
   toastController = inject(ToastController);
@@ -28,6 +32,7 @@ export class HomePage {
   ionViewWillEnter() {
     if (this.loaderShown) {
       this.loading = true; // Show loader only if it hasn't been shown before
+      this.skeleton = true; 
     }
     this.addItems(8);
   }
@@ -84,9 +89,11 @@ export class HomePage {
       }
       this.popularItems.push(...newItems);
       this.loadedItemsCount += count;
-      this.loading = false; // Hide loader after fetching data
+      this.loading = false;
+      this.skeleton = false; // Hide skelton after fetching data
       this.loaderShown = false; // Set flag to true after loader is shown
       this.applyFilter(); // Apply filter after loading new items
+      this.applyCategoryFilter();
     }, 2000);
   }
 
@@ -109,6 +116,19 @@ export class HomePage {
     }
   }
 
+  applyCategoryFilter() {
+    console.log(this.selectedCategory)
+    if (!this.selectedCategory) {
+      // If no category is selected, reset the items to show all items
+      this.popularItems = this.apiService.items.slice(0, this.loadedItemsCount);
+    } else {
+      // Filter items based on the selected category
+      this.popularItems = this.apiService.items
+        .filter(item => item.category.toLowerCase() === this.selectedCategory.toLowerCase())
+        .slice(0, this.loadedItemsCount);
+    }
+  }
+  
   onIonInfinite(ev: any) {
     this.addItems(8);
     setTimeout(() => {
