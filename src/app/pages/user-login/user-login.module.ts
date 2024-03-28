@@ -7,6 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { UserLoginPageRoutingModule } from './user-login-routing.module';
 
 import { UserLoginPage } from './user-login.page';
+import { SQLite } from '@ionic-native/sqlite/ngx';
 
 @NgModule({
   imports: [
@@ -16,6 +17,7 @@ import { UserLoginPage } from './user-login.page';
     UserLoginPageRoutingModule,
     ReactiveFormsModule
   ],
+  providers: [SQLite],
   declarations: [UserLoginPage]
 })
 export class UserLoginPageModule {}

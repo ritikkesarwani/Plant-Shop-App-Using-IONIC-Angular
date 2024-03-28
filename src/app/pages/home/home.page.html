@@ -5,8 +5,8 @@
         <b>Plant Shop</b>
       </ion-label>
     </ion-list-header>
-    <ion-button shape="round" [routerLink]="['/user-login']"><b>Login with Username</b></ion-button>
-    <ion-button shape="round" [routerLink]="['/user-login']"><b>Login with Google</b></ion-button>
-    <ion-text><b>New User? <a routerLink="/user-sign-up"> Sign up</a></b></ion-text>
+    <ion-button shape="round" (click)="loginPage()">Login with Username</ion-button>
+    <ion-button shape="round" (click)="loginPage()"><b>Login with Google</b></ion-button>
+    <ion-text><b>New User? <a (click)="signUpPage()"> Sign up</a></b></ion-text>
   </ion-list>
 </ion-content>

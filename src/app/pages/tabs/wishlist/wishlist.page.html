@@ -1,13 +1,15 @@
-<ion-header [translucent]="true">
+<!-- wishlist.page.html -->
+<ion-header>
   <ion-toolbar>
-    <ion-title>wishlist</ion-title>
+    <ion-title>Wishlist</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">wishlist</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content>
+  <ion-list *ngFor="let item of wishlist | async">
+    <ion-item >
+      <!-- Display wishlist item details -->
+      <img [src]="item?.img" />
+    </ion-item>
+  </ion-list>
 </ion-content>

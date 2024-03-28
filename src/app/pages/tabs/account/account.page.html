@@ -4,7 +4,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding" *ngIf="!loading">
+<ion-content class="ion-padding" *ngIf="!loading && loggedInUser">
   <div class="profile-container">
     <div class="profile-picture">
       <ion-fab vertical="top" horizontal="center" class="icon">
@@ -19,19 +19,19 @@
     <div class="profile-details">
       <ion-item>
         <ion-label position="floating">Full Name</ion-label>
-        <ion-input type="text" [(ngModel)]="user.fullName"></ion-input>
+        <ion-input type="text" [(ngModel)]="loggedInUser.fullName"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label position="floating">Username</ion-label>
-        <ion-input type="text" [(ngModel)]="user.username"></ion-input>
+        <ion-input type="text" [(ngModel)]="loggedInUser.username"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label position="floating">Mobile Number</ion-label>
-        <ion-input type="tel" [(ngModel)]="user.mobileNumber"></ion-input>
+        <ion-input type="tel" [(ngModel)]="loggedInUser.mobileNumber"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label position="floating">Email</ion-label>
-        <ion-input type="email" [(ngModel)]="user.email"></ion-input>
+        <ion-input type="email" [(ngModel)]="loggedInUser.email"></ion-input>
       </ion-item>
     </div>
   </div>

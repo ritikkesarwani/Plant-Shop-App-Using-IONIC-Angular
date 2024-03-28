@@ -1,5 +1,3 @@
-
-
 <ion-menu contentId="main-content">
   <ion-header>
     <ion-toolbar>
@@ -12,9 +10,52 @@
     </ion-toolbar>
   </ion-header>
   <!-- you can remove this upper header text  -->
+
   <ion-content class="ion-padding">
     <!-- write the menu content here -->
-  </ion-content>
+    <ion-card class="menu-profile-card">
+      <ion-card-header>
+        <ion-card-title>{{loggedInUser.fullName}}</ion-card-title>
+        <ion-card-subtitle>{{loggedInUser.mobileNumber}}</ion-card-subtitle>
+      </ion-card-header>
+    </ion-card>
+
+    <ion-list class="menu-options-list">
+      <ion-item class="menu-option-item">
+        <ion-icon slot="start" name="card-outline"></ion-icon>
+        <ion-label>Payment</ion-label>
+      </ion-item>
+      <ion-item class="menu-option-item">
+        <ion-icon slot="start" name="basket-outline"></ion-icon>
+        <ion-label>My Orders</ion-label>
+      </ion-item>
+      <ion-item class="menu-option-item">
+        <ion-icon slot="start" name="analytics-outline"></ion-icon>
+        <ion-label>Transactions</ion-label>
+      </ion-item>
+      <ion-item class="menu-option-item">
+        <ion-icon slot="start" name="document-text-outline"></ion-icon>
+        <ion-label>Order History</ion-label>
+      </ion-item>
+      <ion-item class="menu-option-item">
+        <ion-icon slot="start" name="pricetag-outline"></ion-icon>
+        <ion-label>My Coupons</ion-label>
+      </ion-item>
+      <ion-item class="menu-option-item">
+        <ion-icon slot="start" name="notifications-outline"></ion-icon>
+        <ion-label>Notification Settings</ion-label>
+      </ion-item>
+      <ion-item class="menu-option-item">
+        <ion-icon slot="start" name="help-circle-outline"></ion-icon>
+        <ion-label>Help</ion-label>
+      </ion-item>
+      <ion-item  class="menu-option-item">
+         <ion-icon slot="start" name="log-out"></ion-icon>
+        <ion-label id="present-alert">Logout</ion-label>
+        <ion-alert trigger="present-alert" class="custom-alert" header="Are you sure?" [buttons]="alertButtons"></ion-alert>
+      </ion-item>
+    </ion-list>
+    </ion-content>
 </ion-menu>
 <div class="ion-page" id="main-content">
   <ion-header class="ion-no-border">
@@ -42,18 +83,33 @@
   </ion-refresher>
 
   <ion-grid>
-
     <ion-item lines="none" color="light">
       <ion-label class="title">Plants-Available</ion-label>
     </ion-item>
 
+
+    <!-- sort the item -->
+    <ion-button (click)="presentActionSheet()" color="secondary" size="small">
+      <ion-icon slot="start" name="funnel-outline"></ion-icon>
+       <ion-text>Sort by Price</ion-text>
+    </ion-button>
+    <!-- <ion-action-sheet trigger="open-action-sheet" header="Actions" [buttons]="actionSheetButtons"></ion-action-sheet> -->
+
+
+    <!-- filter the items -->
     <ion-item>
       <ion-select label="Filter By Category" placeholder="Category" [(ngModel)]="selectedCategory" (ionChange)="applyCategoryFilter()">
         <ion-select-option value="India">India</ion-select-option>
         <ion-select-option value="China">China</ion-select-option>
         <ion-select-option value="Japan">Japan</ion-select-option>
+        <ion-select-option value="all">All</ion-select-option>
       </ion-select>
     </ion-item>
+
+
+
+
+
     
     <ion-row *ngIf="popularItems.length > 0">
       <ion-col size="6" *ngFor="let item of popularItems">

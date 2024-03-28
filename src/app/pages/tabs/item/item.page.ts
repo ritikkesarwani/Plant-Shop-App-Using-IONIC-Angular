@@ -4,6 +4,7 @@ import { NavController } from '@ionic/angular';
 import { take } from 'rxjs';
 import { ApiService } from 'src/app/services/api/api.service';
 
+
 @Component({
   selector: 'app-item',
   templateUrl: './item.page.html',
@@ -17,7 +18,8 @@ export class ItemPage implements OnInit {
   constructor(
     public navCtrl: NavController,
     private route: ActivatedRoute,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private wishlistService: ApiService
   ) { }
 
   ngOnInit(): void {
@@ -26,6 +28,11 @@ export class ItemPage implements OnInit {
       console.log('Test ID:', this.testId);
       this.item = this.apiService.getItem(this.testId);
     });
+  }
+
+
+  addToWishlist(item: any): void {
+    this.wishlistService.addToWishlist(item);
   }
 
 }

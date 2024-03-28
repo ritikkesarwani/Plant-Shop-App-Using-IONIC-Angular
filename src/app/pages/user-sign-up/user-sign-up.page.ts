@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ToastController } from '@ionic/angular';
+import { LoadingController, NavController, ToastController } from '@ionic/angular';
+import { User } from 'src/app/Model/User.data';
+import { UserAuthService } from 'src/app/services/user-auth/user-auth.service';
 
 @Component({
   selector: 'app-user-sign-up',
@@ -9,6 +11,7 @@ import { ToastController } from '@ionic/angular';
   styleUrls: ['./user-sign-up.page.scss'],
 })
 export class UserSignUpPage implements OnInit {
+  registerLoading = false;
   submitted = false;
   signUpForm!: FormGroup;
   fieldErrors = {
@@ -23,7 +26,10 @@ export class UserSignUpPage implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private toastController: ToastController,
-    private router: Router
+    private router: Router,
+    private loadingController: LoadingController,
+    private userAuthService: UserAuthService,
+    private navCtrl : NavController
   ) { }
 
   ngOnInit(): void {
@@ -39,47 +45,111 @@ export class UserSignUpPage implements OnInit {
 
   async register(): Promise<void> {
     this.submitted = true;
-    let errorMessage: string | null = null;
-
-    if (!this.signUpForm.get('mobileNumber')?.value) {
-      errorMessage = this.fieldErrors.mobileNumber;
-    } else if (this.signUpForm.get('mobileNumber')?.invalid) {
-      errorMessage = 'Please enter a valid 10-digit mobile number.';
-    } else if (!this.signUpForm.get('email')?.value) {
-      errorMessage = this.fieldErrors.email;
-    } else if (this.signUpForm.get('email')?.invalid) {
-      errorMessage = 'Please enter a valid email address';
-    } else if (!this.signUpForm.get('fullName')?.value) {
-      errorMessage = this.fieldErrors.fullName;
-    } else if (this.signUpForm.get('fullName')?.invalid) {
-      errorMessage = 'Please enter a valid full name, it  must only contain letters and spaces.';
-    } else if (!this.signUpForm.get('username')?.value) {
-      errorMessage = this.fieldErrors.username;
-    } else if (this.signUpForm.get('username')?.invalid) {
-      errorMessage = 'Username must be alphanumeric with up to 8 characters';
-    } else if (!this.signUpForm.get('password')?.value) {
-      errorMessage = this.fieldErrors.password;
-    } else if (this.signUpForm.get('password')?.invalid) {
-      errorMessage = 'Please enter a valid password';
-    } else if (this.signUpForm.get('password')?.value !== this.signUpForm.get('confirmPassword')?.value) {
-      errorMessage = 'Passwords do not match';
-    }
+    const errorMessage = this.validateForm();
 
     if (errorMessage) {
       this.presentToast(errorMessage);
       return;
     }
+    console.log("Registed got clicked")
 
-    // register, if all fields are valid
+    // Proceed with registration if form is valid
+    // if (this.signUpForm.valid) {
+    //   const userData = this.signUpForm.value;
+    //   localStorage.setItem(userData.username, JSON.stringify(userData));
+    //   localStorage.setItem('loggedInUser', JSON.stringify(userData));
+    //   await this.showRegisterLoading();
+    // }
+
     if (this.signUpForm.valid) {
-      const userData = this.signUpForm.value;
-      localStorage.setItem(userData.username, JSON.stringify(userData));
-      this.router.navigate(['/tabs']);
+      const user: User = { ...this.signUpForm.value }; // Copy form value to a new object
+      const password = this.signUpForm.get('password')?.value;
+      const confirmPassword = this.signUpForm.get('confirmPassword')?.value;
+  
+      if (password !== confirmPassword) {
+        this.presentToast('Passwords do not match');
+        return;
+      }
+
+      delete user.confirmPassword;
+
+      
+      this.registerLoading = true;
+      const loading = await this.loadingController.create({
+        message: 'Registering...',
+        duration: 2000 // Adjust duration as needed
+      });
+      await loading.present();
+  
+      try {
+        console.log(user)
+        const registered = await this.userAuthService.register(user);
+        if (registered) {
+          this.navigateToTabsPage();
+        } else {
+          this.presentToast('Registration failed. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error during registration:', error);
+        this.presentToast('An unexpected error occurred. Please try again later.');
+      }
+  
+      this.registerLoading = false;
+    } else {
+      console.log('Invalid form');
     }
+    
+
+
+  }
+
+  validateForm(): string | null {
+    if (!this.signUpForm.get('mobileNumber')?.value) {
+      return this.fieldErrors.mobileNumber;
+    } else if (this.signUpForm.get('mobileNumber')?.invalid) {
+      return 'Please enter a valid 10-digit mobile number.';
+    } else if (!this.signUpForm.get('email')?.value) {
+      return this.fieldErrors.email;
+    } else if (this.signUpForm.get('email')?.invalid) {
+      return 'Please enter a valid email address';
+    } else if (!this.signUpForm.get('fullName')?.value) {
+      return this.fieldErrors.fullName;
+    } else if (this.signUpForm.get('fullName')?.invalid) {
+      return 'Please enter a valid full name, it  must only contain letters and spaces.';
+    } else if (!this.signUpForm.get('username')?.value) {
+      return this.fieldErrors.username;
+    } else if (this.signUpForm.get('username')?.invalid) {
+      return 'Username must be alphanumeric with up to 8 characters';
+    } else if (!this.signUpForm.get('password')?.value) {
+      return this.fieldErrors.password;
+    } else if (this.signUpForm.get('password')?.invalid) {
+      return 'Please enter a valid password';
+    } else if (this.signUpForm.get('password')?.value !== this.signUpForm.get('confirmPassword')?.value) {
+      return 'Passwords do not match';
+    }
+    return null;
+  }
+
+  async showRegisterLoading(): Promise<void> {
+    this.registerLoading = true;
+    const loading = await this.loadingController.create({
+      message: 'Registration successful! Logging in...'
+    });
+    await loading.present();
+
+    setTimeout(async () => {
+      await loading.dismiss();
+      await this.navigateToTabsPage();
+    }, 2000);
+  }
+
+  async navigateToTabsPage(): Promise<void> {
+    await this.router.navigate(['/tabs']);
   }
 
   goBack(): void {
-    this.router.navigate(['/home']);
+    this.navCtrl.navigateBack(['/home']);
+    
   }
 
   async presentToast(message: string) {

@@ -9,28 +9,29 @@ import { Capacitor } from '@capacitor/core';
 })
 export class AccountPage implements OnInit {
   
-  user = {
-    fullName: '',
-    username: '',
-    mobileNumber: '',
-    email: ''
-  };
+  // user = {
+  //   fullName: '',
+  //   username: '',
+  //   mobileNumber: '',
+  //   email: ''
+  // };
 
+  loggedInUser: any;
   selectedImage: any;
   loading: boolean = true; // Initially set loading to true to show skeleton loading effect
 
   constructor() { }
 
   ngOnInit(): void {
+    const storedUser = localStorage.getItem('loggedInUser');
+    if (storedUser) {
+      this.loggedInUser = JSON.parse(storedUser);
+    }
+
     // Simulate fetching user data from an API
     setTimeout(() => {
-      this.user = {
-        fullName: 'John Doe',
-        username: 'johndoe123',
-        mobileNumber: '1234567890',
-        email: 'john@example.com'
-      };
-      this.loading = false; // Set loading to false once data is fetched to hide skeleton loading effect
+      // Set loading to false once data is fetched
+      this.loading = false;
     }, 2000); // Simulate a 2-second delay for data fetching
   }
 

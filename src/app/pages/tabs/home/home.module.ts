@@ -11,6 +11,9 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
+import { ScrollingModule } from '@angular/cdk/scrolling';
+
+
 
 
 
@@ -19,7 +22,8 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
     CommonModule,
     FormsModule,
     IonicModule,
-    HomePageRoutingModule
+    HomePageRoutingModule,
+    ScrollingModule
   ],
   declarations: [HomePage],
   schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA]

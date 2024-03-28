@@ -1,19 +1,21 @@
 import { Component, inject } from '@angular/core';
 import { ApiService } from 'src/app/services/api/api.service';
 import { RefresherEventDetail } from '@ionic/core';
-import { InfiniteScrollCustomEvent, NavController, ToastController, IonToast } from '@ionic/angular';
+import { InfiniteScrollCustomEvent, NavController, ToastController, IonToast, ActionSheetController } from '@ionic/angular';
 import { Keyboard } from '@capacitor/keyboard';
+import { UserAuthService } from 'src/app/services/user-auth/user-auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
 })
+
 export class HomePage {
 
+  loggedInUser: any;
   selectedCategory: string = ''; // Variable to store the selected category
-
-
   popularItems: any[] = [];
   loadedItemsCount = 0;
   myInput = "";
@@ -22,17 +24,23 @@ export class HomePage {
   loading: boolean = false; // Variable to indicate data loading
   skeleton: boolean = false;
   loaderShown: boolean = true; // Flag to track whether the loader has been shown
+  applyingFilter: boolean = false;
+  sortOrder: 'asc' | 'desc' | 'all' = 'all'; // Variable to store the sorting order
+
 
   toastController = inject(ToastController);
 
   constructor(public apiService: ApiService,
-    private navCtrl: NavController) {
+    private authService: UserAuthService,
+    private navCtrl: NavController,
+    private route: Router,
+    private actionSheetCtrl: ActionSheetController) {
   }
 
   ionViewWillEnter() {
     if (this.loaderShown) {
       this.loading = true; // Show loader only if it hasn't been shown before
-      this.skeleton = true; 
+      this.skeleton = true;
     }
     this.addItems(8);
   }
@@ -46,6 +54,73 @@ export class HomePage {
     Keyboard.addListener('keyboardWillHide', async () => {
       await this.presentToast('Keyboard Will Hide ', 'top');
     });
+
+    const storedUser = localStorage.getItem('loggedInUser');
+    if (storedUser) {
+      this.loggedInUser = JSON.parse(storedUser);
+    }
+  }
+
+  public alertButtons = [
+    {
+      text: 'No',
+      cssClass: 'alert-button-cancel',
+    },
+    {
+      text: 'Yes',
+      cssClass: 'alert-button-confirm',
+      handler: ()=>{
+        console.log("hey");
+        this.logout();
+      }
+    },
+  ];
+
+
+  // Method to present the action sheet for sorting options
+  async presentActionSheet() {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Sort Options',
+      buttons: [
+        {
+          text: 'Low to High',
+          handler: () => {
+            this.sortLowToHigh();
+          }
+        },
+        {
+          text: 'High to Low',
+          handler: () => {
+            this.sortHighToLow();
+          }
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {
+            console.log('Cancel clicked');
+          }
+        }
+      ]
+    });
+
+    await actionSheet.present();
+  };
+
+
+
+  // Method to sort items from low to high
+  sortLowToHigh() {
+    this.sortOrder = 'asc';
+    // Logic to sort items from low to high
+    this.popularItems.sort((a, b) => a.price - b.price);
+  }
+
+  // Method to sort items from high to low
+  sortHighToLow() {
+    this.sortOrder = 'desc';
+    // Logic to sort items from high to low
+    this.popularItems.sort((a, b) => b.price - a.price);
   }
 
   async showKeyboard() {
@@ -65,7 +140,6 @@ export class HomePage {
       duration: 1800,
       position
     });
-
     await toast.present();
   }
 
@@ -76,7 +150,6 @@ export class HomePage {
       duration: 1500,
       position
     });
-
     await toast.present();
   }
 
@@ -92,8 +165,12 @@ export class HomePage {
       this.loading = false;
       this.skeleton = false; // Hide skelton after fetching data
       this.loaderShown = false; // Set flag to true after loader is shown
-      this.applyFilter(); // Apply filter after loading new items
-      this.applyCategoryFilter();
+      if (!this.applyingFilter) {
+        this.applyingFilter = true;
+        this.applyCategoryFilter(); // Apply category filter after loading new items
+        this.applyFilter(); // Apply search filter after loading new items
+        this.applyingFilter = false;
+      }
     }, 2000);
   }
 
@@ -105,30 +182,50 @@ export class HomePage {
   }
 
   applyFilter() {
-    const searchValue = this.searchQuery.trim().toLowerCase();
+    // Apply search filter
+    const searchValue = this.searchQuery.trim().toLowerCase(); // Convert search query to lowercase for case-insensitive matching
     if (!searchValue || searchValue === '') {
       this.popularItems = this.apiService.items.slice(0, this.loadedItemsCount);
+      this.applyCategoryFilter();
     } else {
-      this.popularItems = this.apiService.items
-        .filter(item =>
-          item.name.toLowerCase().includes(searchValue) || item.price.toString().includes(searchValue) || item.category.toLowerCase().toString().includes(searchValue))
-        .slice(0, this.loadedItemsCount);
+      this.popularItems = this.apiService.items.filter(item =>
+        item.name.toLowerCase().includes(searchValue) ||
+        item.price.toString().includes(searchValue) ||
+        item.category.toLowerCase().includes(searchValue)
+      );
+    }
+  };
+  applyCategoryFilter() {
+    // Apply category filter
+    const searchValue = this.searchQuery.trim().toLowerCase(); // Convert search query to lowercase for case-insensitive matching
+    if (!this.selectedCategory || this.selectedCategory === 'all') {
+      // If no category selected or 'All' selected, show all items based on search filter
+      this.popularItems = this.apiService.items.slice(0, this.loadedItemsCount);
+
+      this.popularItems = this.popularItems.filter(item =>
+        item.name.toLowerCase().includes(searchValue) ||
+        item.price.toString().includes(searchValue) ||
+        item.category.toLowerCase().includes(searchValue)
+      );
+    } else {
+      // Filter items based only on the selected category
+      this.popularItems = this.apiService.items.filter(item =>
+        item.category.toLowerCase() === this.selectedCategory.toLowerCase()
+      );
+      // Apply search filter within the selected category
+      this.popularItems = this.popularItems.filter(item =>
+        item.name.toLowerCase().includes(searchValue) ||
+        item.price.toString().includes(searchValue) ||
+        item.category.toLowerCase().includes(searchValue)
+      );
     }
   }
 
-  applyCategoryFilter() {
-    console.log(this.selectedCategory)
-    if (!this.selectedCategory) {
-      // If no category is selected, reset the items to show all items
-      this.popularItems = this.apiService.items.slice(0, this.loadedItemsCount);
-    } else {
-      // Filter items based on the selected category
-      this.popularItems = this.apiService.items
-        .filter(item => item.category.toLowerCase() === this.selectedCategory.toLowerCase())
-        .slice(0, this.loadedItemsCount);
-    }
+  logout(): void {
+    this.authService.logout();
+    this.route.navigate(['/home']);
   }
-  
+
   onIonInfinite(ev: any) {
     this.addItems(8);
     setTimeout(() => {
