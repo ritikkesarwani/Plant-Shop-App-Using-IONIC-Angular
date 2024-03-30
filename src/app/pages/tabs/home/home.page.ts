@@ -1,10 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { ApiService } from 'src/app/services/api/api.service';
 import { RefresherEventDetail } from '@ionic/core';
-import { InfiniteScrollCustomEvent, NavController, ToastController, IonToast, ActionSheetController } from '@ionic/angular';
+import { InfiniteScrollCustomEvent, NavController, ToastController, IonToast, ActionSheetController, AlertController } from '@ionic/angular';
 import { Keyboard } from '@capacitor/keyboard';
 import { UserAuthService } from 'src/app/services/user-auth/user-auth.service';
 import { Router } from '@angular/router';
+import { DatabaseService } from 'src/app/services/database.service';
+import { Storage } from '@capacitor/storage';
 
 @Component({
   selector: 'app-home',
@@ -15,37 +17,43 @@ import { Router } from '@angular/router';
 export class HomePage {
 
   loggedInUser: any;
-  selectedCategory: string = ''; // Variable to store the selected category
+  selectedCategory = ''; // Variable to store the selected category
   popularItems: any[] = [];
   loadedItemsCount = 0;
-  myInput = "";
-  searchQuery: string = ""; // Variable to store the search query
-  moreDataAvailable: boolean = true; // Flag to indicate if more data is available
-  loading: boolean = false; // Variable to indicate data loading
-  skeleton: boolean = false;
-  loaderShown: boolean = true; // Flag to track whether the loader has been shown
-  applyingFilter: boolean = false;
+  myInput = '';
+  searchQuery = ''; // Variable to store the search query
+  moreDataAvailable = true; // Flag to indicate if more data is available
+  loading = false; // Variable to indicate data loading
+  skeleton = false;
+  loaderShown = true; // Flag to track whether the loader has been shown
+  applyingFilter = false;
   sortOrder: 'asc' | 'desc' | 'all' = 'all'; // Variable to store the sorting order
-
 
   toastController = inject(ToastController);
 
   constructor(public apiService: ApiService,
     private authService: UserAuthService,
-    private navCtrl: NavController,
     private route: Router,
-    private actionSheetCtrl: ActionSheetController) {
+    private actionSheetCtrl: ActionSheetController,
+    public alertController: AlertController,
+    ) {
   }
 
-  ionViewWillEnter() {
+  ionViewWDidEnter() {
+   
+  }
+
+  async ngOnInit(): Promise<void> {
+
+    await this.loadLoggedInUser();
+
     if (this.loaderShown) {
       this.loading = true; // Show loader only if it hasn't been shown before
       this.skeleton = true;
     }
-    this.addItems(8);
-  }
 
-  ngOnInit(): void {
+    this.addItems(8);
+
     Keyboard.addListener('keyboardWillShow', async (info) => {
       console.log('keyboard will show with height:', info.keyboardHeight);
       await this.presentToast('Keyboard Will Show ', 'top');
@@ -55,27 +63,51 @@ export class HomePage {
       await this.presentToast('Keyboard Will Hide ', 'top');
     });
 
-    const storedUser = localStorage.getItem('loggedInUser');
-    if (storedUser) {
-      this.loggedInUser = JSON.parse(storedUser);
+  }
+
+  async loadLoggedInUser() {
+    console.log('homepage calling')
+    try {
+      console.log('enter in try block')
+      const { value } = await Storage.get({ key: 'loggedInUser' });
+      if (value) {
+        console.log('enter in if')
+        this.loggedInUser = JSON.parse(value); // Deserialize the stored user object
+        console.log(this.loggedInUser)
+      } else {
+        console.log('User data not found in storage');
+      }
+    } catch (error) {
+      console.error('Error retrieving user data:', error);
     }
   }
 
-  public alertButtons = [
-    {
-      text: 'No',
-      cssClass: 'alert-button-cancel',
-    },
-    {
-      text: 'Yes',
-      cssClass: 'alert-button-confirm',
-      handler: ()=>{
-        console.log("hey");
-        this.logout();
-      }
-    },
-  ];
+  async presentAlertConfirm() {
+    const alert = await this.alertController.create({
+      cssClass: 'my-custom-class',
+      header: 'Logout!!',
+      message: 'Are you sure?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: blah => {
+            console.log('Confirm Cancel: blah');
+          }
+        },
+        {
+          text: 'Okay',
+          handler: () => {
+            this.logout();
+            console.log('Confirm Okay');
+          }
+        }
+      ]
+    });
 
+    await alert.present();
+  }
 
   // Method to present the action sheet for sorting options
   async presentActionSheet() {
@@ -107,8 +139,6 @@ export class HomePage {
     await actionSheet.present();
   };
 
-
-
   // Method to sort items from low to high
   sortLowToHigh() {
     this.sortOrder = 'asc';
@@ -131,7 +161,6 @@ export class HomePage {
     });
     this.applyFilter(); // Apply filter when showing keyboard
   }
-
 
   async presentToast(message: string, position: 'top' | 'middle' | 'bottom') {
     const toast = await this.toastController.create({
@@ -163,7 +192,7 @@ export class HomePage {
       this.popularItems.push(...newItems);
       this.loadedItemsCount += count;
       this.loading = false;
-      this.skeleton = false; // Hide skelton after fetching data
+      this.skeleton = false; // Hide skeleton after fetching data
       this.loaderShown = false; // Set flag to true after loader is shown
       if (!this.applyingFilter) {
         this.applyingFilter = true;
@@ -195,6 +224,7 @@ export class HomePage {
       );
     }
   };
+  
   applyCategoryFilter() {
     // Apply category filter
     const searchValue = this.searchQuery.trim().toLowerCase(); // Convert search query to lowercase for case-insensitive matching
@@ -233,3 +263,4 @@ export class HomePage {
     }, 3000);
   }
 }
+

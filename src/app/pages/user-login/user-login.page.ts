@@ -1,10 +1,10 @@
-// user-login.page.ts
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserAuthService } from 'src/app/services/user-auth/user-auth.service';
 import { NavController, ToastController, LoadingController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { User } from 'src/app/Model/User.data';
+import { Storage } from '@capacitor/storage';
 
 @Component({
   selector: 'app-user-login',
@@ -13,7 +13,8 @@ import { User } from 'src/app/Model/User.data';
 })
 export class UserLoginPage implements OnInit {
   loginForm!: FormGroup;
-  loginLoading = false; // Track loading state for login button
+  loginLoading = false;
+  showPassword = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -21,70 +22,51 @@ export class UserLoginPage implements OnInit {
     private navCtrl: NavController,
     private toastController: ToastController,
     private router: Router,
-    private loadingController: LoadingController // Inject LoadingController
-  ) { }
+    private loadingController: LoadingController
+  ) {}
 
   ngOnInit() {
+    this.initializeForm();
+  }
+
+  initializeForm(): void {
     this.loginForm = this.formBuilder.group({
       username: ['', Validators.required],
       password: ['', Validators.required]
     });
   }
 
-  // async login(): Promise<void> {
-  //   if (this.loginForm.valid) {
-  //     this.loginLoading = true; // Show loader for login button
-  //     const loading = await this.loadingController.create({
-  //       message: 'Logging in...',
-  //       duration: 1500 // Show loader for 2 seconds
-  //     });
-  //     await loading.present();
-
-      
-  //     const user = this.loginForm.value as User;
-  //     const username = this.loginForm.value.username;
-  //     const password = this.loginForm.value.password;
-
-  //     const loggedIn = this.authService.login(username, password);
-
-  //     if (loggedIn) {
-  //       // Fetch complete user data from local storage
-  //       const storedUserData = localStorage.getItem(username);
-  //       if (storedUserData) {
-  //         const userData = JSON.parse(storedUserData);
-  //         localStorage.setItem('loggedInUser', JSON.stringify(userData)); // Store complete user data
-  //         this.navCtrl.navigateForward(['/tabs']);
-  //       }}
-  //      else {
-  //       const toast = await this.toastController.create({
-  //         message: 'Incorrect username or password',
-  //         duration: 3000,
-  //         color: 'danger'
-  //       });
-  //       await toast.present();
-  //     }
-
-  //     this.loginLoading = false; // Hide loader after 2 seconds
-  //   }
-  //   else {
-  //     console.log('Invalid form');
-  //   }
-  // }
-
   async login(): Promise<void> {
     if (this.loginForm.valid) {
-      this.loginLoading = true; // Show loader for login button
+      this.loginLoading = true;
       const loading = await this.loadingController.create({
         message: 'Logging in...',
-        duration: 3500 // Show loader for 2 seconds
+        duration: 3500
       });
       await loading.present();
 
-      const user = this.loginForm.value as User;
-      const loggedIn = await this.authService.login(user);
+      const { username, password } = this.loginForm.value;
+
+      const loggedIn = await this.authService.login({
+        username,
+        password,
+        mobileNumber: '',
+        fullName: '',
+        email: ''
+      });
 
       if (loggedIn) {
-        this.navCtrl.navigateForward(['/tabs']);
+        try {
+          const { value } = await Storage.get({ key: 'loggedInUser' });
+          if (value) {
+            const userData = JSON.parse(value);
+            this.navCtrl.navigateForward(['/tabs']);
+          } else {
+            console.error('User data not found in storage');
+          }
+        } catch (error) {
+          console.error('Error retrieving user data from storage:', error);
+        }
       } else {
         const toast = await this.toastController.create({
           message: 'Incorrect username or password',
@@ -94,7 +76,7 @@ export class UserLoginPage implements OnInit {
         await toast.present();
       }
 
-      this.loginLoading = false; // Hide loader after 2 seconds
+      this.loginLoading = false;
     } else {
       console.log('Invalid form');
     }
@@ -104,4 +86,3 @@ export class UserLoginPage implements OnInit {
     this.router.navigate(['/home']);
   }
 }
-

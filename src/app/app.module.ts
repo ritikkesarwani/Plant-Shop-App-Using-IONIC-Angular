@@ -11,17 +11,22 @@ import { HttpClientModule } from '@angular/common/http';
 import { SQLite } from '@ionic-native/sqlite/ngx';
 import { DatabaseService } from './services/database.service';
 import { UserAuthService } from './services/user-auth/user-auth.service';
+import { IonicStorageModule, Storage } from '@ionic/storage-angular';
+
+
 
 
 
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule,HttpClientModule],
+  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule,HttpClientModule,IonicStorageModule.forRoot()],
   providers: [
     DatabaseService,
     SQLite,
     UserAuthService,
+    Storage,
+
 
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],

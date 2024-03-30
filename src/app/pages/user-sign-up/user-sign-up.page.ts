@@ -14,6 +14,7 @@ export class UserSignUpPage implements OnInit {
   registerLoading = false;
   submitted = false;
   signUpForm!: FormGroup;
+
   fieldErrors = {
     mobileNumber: 'Mobile number is required.',
     email: 'Email is required.',
@@ -29,10 +30,14 @@ export class UserSignUpPage implements OnInit {
     private router: Router,
     private loadingController: LoadingController,
     private userAuthService: UserAuthService,
-    private navCtrl : NavController
+    private navCtrl: NavController
   ) { }
 
   ngOnInit(): void {
+    this.initializeForm();
+  }
+
+  initializeForm(): void {
     this.signUpForm = this.formBuilder.group({
       mobileNumber: ['', [Validators.required, Validators.pattern('[0-9]{10}')]],
       email: ['', [Validators.required, Validators.email]],
@@ -51,21 +56,12 @@ export class UserSignUpPage implements OnInit {
       this.presentToast(errorMessage);
       return;
     }
-    console.log("Registed got clicked")
-
-    // Proceed with registration if form is valid
-    // if (this.signUpForm.valid) {
-    //   const userData = this.signUpForm.value;
-    //   localStorage.setItem(userData.username, JSON.stringify(userData));
-    //   localStorage.setItem('loggedInUser', JSON.stringify(userData));
-    //   await this.showRegisterLoading();
-    // }
 
     if (this.signUpForm.valid) {
-      const user: User = { ...this.signUpForm.value }; // Copy form value to a new object
+      const user: User = { ...this.signUpForm.value };
       const password = this.signUpForm.get('password')?.value;
       const confirmPassword = this.signUpForm.get('confirmPassword')?.value;
-  
+
       if (password !== confirmPassword) {
         this.presentToast('Passwords do not match');
         return;
@@ -73,34 +69,27 @@ export class UserSignUpPage implements OnInit {
 
       delete user.confirmPassword;
 
-      
-      this.registerLoading = true;
-      const loading = await this.loadingController.create({
-        message: 'Registering...',
-        duration: 2000 // Adjust duration as needed
-      });
-      await loading.present();
-  
       try {
-        console.log(user)
+        this.registerLoading = true;
+        const loading = await this.loadingController.create({
+          message: 'Registering...',
+          duration: 2000
+        });
+        await loading.present();
+
         const registered = await this.userAuthService.register(user);
         if (registered) {
-          this.navigateToTabsPage();
+          await this.navigateToTabsPage();
         } else {
           this.presentToast('Registration failed. Please try again.');
         }
       } catch (error) {
         console.error('Error during registration:', error);
         this.presentToast('An unexpected error occurred. Please try again later.');
+      } finally {
+        this.registerLoading = false;
       }
-  
-      this.registerLoading = false;
-    } else {
-      console.log('Invalid form');
     }
-    
-
-
   }
 
   validateForm(): string | null {
@@ -115,7 +104,7 @@ export class UserSignUpPage implements OnInit {
     } else if (!this.signUpForm.get('fullName')?.value) {
       return this.fieldErrors.fullName;
     } else if (this.signUpForm.get('fullName')?.invalid) {
-      return 'Please enter a valid full name, it  must only contain letters and spaces.';
+      return 'Please enter a valid full name, it must only contain letters and spaces.';
     } else if (!this.signUpForm.get('username')?.value) {
       return this.fieldErrors.username;
     } else if (this.signUpForm.get('username')?.invalid) {
@@ -130,29 +119,15 @@ export class UserSignUpPage implements OnInit {
     return null;
   }
 
-  async showRegisterLoading(): Promise<void> {
-    this.registerLoading = true;
-    const loading = await this.loadingController.create({
-      message: 'Registration successful! Logging in...'
-    });
-    await loading.present();
-
-    setTimeout(async () => {
-      await loading.dismiss();
-      await this.navigateToTabsPage();
-    }, 2000);
-  }
-
   async navigateToTabsPage(): Promise<void> {
     await this.router.navigate(['/tabs']);
   }
 
   goBack(): void {
     this.navCtrl.navigateBack(['/home']);
-    
   }
 
-  async presentToast(message: string) {
+  async presentToast(message: string): Promise<void> {
     const toast = await this.toastController.create({
       message: message,
       duration: 3000,

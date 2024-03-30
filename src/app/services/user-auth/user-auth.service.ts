@@ -30,6 +30,7 @@ export class UserAuthService {
   async login(user: User): Promise<boolean> {
     return this.databaseService.login(user);
   }
+  
   logout(): void {
     localStorage.removeItem('loggedInUser');
   }

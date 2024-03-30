@@ -17,8 +17,9 @@
           
           <ion-item>
             <ion-label position="stacked">Password</ion-label>
-            <ion-input type="password" formControlName="password" placeholder="Enter your password"></ion-input>
+            <ion-input [type]= "showPassword? 'text': 'password'" formControlName="password" placeholder="Enter your password"></ion-input>
             <!-- <ion-icon slot="end" name="alert-circle-outline" color="danger"></ion-icon> -->
+            <ion-icon [name]="showPassword? 'eye': 'eye-off'" (click)="showPassword = !showPassword" col="1" slot="end"></ion-icon>
           </ion-item>
           
 

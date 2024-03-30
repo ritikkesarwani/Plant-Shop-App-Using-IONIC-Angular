@@ -15,8 +15,8 @@
     <!-- write the menu content here -->
     <ion-card class="menu-profile-card">
       <ion-card-header>
-        <ion-card-title>{{loggedInUser.fullName}}</ion-card-title>
-        <ion-card-subtitle>{{loggedInUser.mobileNumber}}</ion-card-subtitle>
+        <ion-card-title>{{loggedInUser?.fullName}}</ion-card-title>
+        <ion-card-subtitle>{{loggedInUser?.mobileNumber}}</ion-card-subtitle>
       </ion-card-header>
     </ion-card>
 
@@ -49,11 +49,14 @@
         <ion-icon slot="start" name="help-circle-outline"></ion-icon>
         <ion-label>Help</ion-label>
       </ion-item>
-      <ion-item  class="menu-option-item">
-         <ion-icon slot="start" name="log-out"></ion-icon>
-        <ion-label id="present-alert">Logout</ion-label>
-        <ion-alert trigger="present-alert" class="custom-alert" header="Are you sure?" [buttons]="alertButtons"></ion-alert>
+      <ion-item  class="menu-option-item" (click)="presentAlertConfirm()"  size="small">
+          <ion-icon slot="start" name="log-out-outline"></ion-icon>
+          <ion-label>Logout</ion-label>
       </ion-item>
+      <!-- <ion-button (click)="presentAlertConfirm()" color="secondary" size="small">
+        <ion-icon slot="start" name="log-out"></ion-icon>
+        <ion-label>Logout</ion-label>
+      </ion-button> -->
     </ion-list>
     </ion-content>
 </ion-menu>

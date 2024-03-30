@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Capacitor } from '@capacitor/core';
+import { Storage } from '@capacitor/storage';
 
 @Component({
   selector: 'app-account',
@@ -8,61 +9,55 @@ import { Capacitor } from '@capacitor/core';
   styleUrls: ['./account.page.scss'],
 })
 export class AccountPage implements OnInit {
-  
-  // user = {
-  //   fullName: '',
-  //   username: '',
-  //   mobileNumber: '',
-  //   email: ''
-  // };
-
   loggedInUser: any;
   selectedImage: any;
   loading: boolean = true; // Initially set loading to true to show skeleton loading effect
 
   constructor() { }
+  
+  async ngOnInit(): Promise<void> {
+    await this.loadLoggedInUser();
 
-  ngOnInit(): void {
-    const storedUser = localStorage.getItem('loggedInUser');
-    if (storedUser) {
-      this.loggedInUser = JSON.parse(storedUser);
-    }
-
-    // Simulate fetching user data from an API
+    // Simulate fetching user data from storage
     setTimeout(() => {
       // Set loading to false once data is fetched
       this.loading = false;
     }, 2000); // Simulate a 2-second delay for data fetching
   }
 
-  checkPlatformForWeb() {
-    if(Capacitor.getPlatform() == 'web') return true;
-    return false;
+  async loadLoggedInUser() {
+    try {
+      const { value } = await Storage.get({ key: 'loggedInUser' });
+      if (value) {
+        this.loggedInUser = JSON.parse(value); // Deserialize the stored user object
+      } else {
+        console.log('User data not found in storage');
+      }
+    } catch (error) {
+      console.error('Error retrieving user data:', error);
+    }
   }
 
+  // Check if platform is web
+  checkPlatformForWeb(): boolean {
+    return Capacitor.getPlatform() === 'web';
+  }
   
   async takePicture(){
-    //await Camera.requestPermissions();
+    // Get picture from camera
     const image = await Camera.getPhoto({
       quality: 50,
-      //allowEditing: true,
       source: CameraSource.Prompt,
-      width:600,
-      resultType: this.checkPlatformForWeb()? CameraResultType.DataUrl : CameraResultType.Uri
+      width: 600,
+      resultType: this.checkPlatformForWeb() ? CameraResultType.DataUrl : CameraResultType.Uri
     });
   
-    // image.webPath will contain a path that can be set as an image src.
-    // You can access the original file using image.path, which can be
-    // passed to the Filesystem API to read the raw data of the image,
-    // if desired (or pass resultType: CameraResultType.Base64 to getPhoto)
-   // var imageUrl = image.webPath;
-  
-    // Can be set to the src of an image now
-    //imageElement.src = imageUrl;
+    // Set selected image
     this.selectedImage = image;
-    if(this.checkPlatformForWeb()) this.selectedImage.webPath = image.dataUrl;
-  
+    
+    // For web platform, set web path
+    if (this.checkPlatformForWeb()) {
+      this.selectedImage.webPath = image.dataUrl;
+    }
   }
-
-
 }

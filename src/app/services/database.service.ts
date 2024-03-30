@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Platform } from '@ionic/angular';
 import { SQLite, SQLiteObject } from '@ionic-native/sqlite/ngx';
 import { User } from '../Model/User.data';
+import { Storage } from '@capacitor/storage';
 
 @Injectable({
   providedIn: 'root'
@@ -12,41 +13,28 @@ export class DatabaseService {
   dbConfig = {
     name: 'data.db',
     location: 'default'
-  }
-  platformReady = false;
+  };
+
+  loggedInUsername: string | null = null; // Property to store the username of the logged-in user
 
   constructor(
     private sqlite: SQLite, 
-    private platform: Platform
-    ){ 
-    this.platform.ready().then(() => {
-      this.sqlite.echoTest()
-      this.sqlite.create(this.dbConfig).then((db: SQLiteObject) => {
-        this.db = db;
-        this.createTable();
-      }).catch(error => console.error(error))
-    });
+    private platform: Platform,
+  ) { 
+    this.initializeDatabase();
   }
 
-  // createDatabase() {
-  //   if (!this.platformReady) {
-  //     console.error('Platform is not ready');
-  //     return;
-  //   }
-  //   this.sqlite.create(this.dbConfig)
-  //     .then((db: SQLiteObject) => {
-  //       this.db = db;
-  //       console.log('Database Connected');
-        
-  //     })
-  //     .catch(error => console.error('Error creating database:', error));
-  // }
-
-  createTable() {
-    if (!this.db) {
-      console.error('Database is not initialized');
-      return;
+  private async initializeDatabase(): Promise<void> {
+    try {
+      await this.platform.ready();
+      this.db = await this.sqlite.create(this.dbConfig);
+      await this.createTable();
+    } catch (error) {
+      console.error('Error initializing database:', error);
     }
+  }
+
+  private async createTable(): Promise<void> {
     const query = `CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       fullName TEXT,
@@ -55,21 +43,24 @@ export class DatabaseService {
       email TEXT,
       mobileNumber TEXT
     )`;
-    console.log('Creating table');
-    this.db.executeSql(query, [])
-      .then(() => console.log('Table created successfully'))
-      .catch(error => console.error('Error creating table:', error));
+    try {
+      console.log('Creating table');
+      await this.db.executeSql(query, []);
+      console.log('Table created successfully');
+    } catch (error) {
+      console.error('Error creating table:', error);
+    }
   }
 
   async register(user: User): Promise<boolean> {
-    await this.waitForDatabase();
-    if (!this.db) {
-      console.error('Database is not initialized');
-      return false;
-    }
-    const query = `INSERT INTO users (fullName, username, password, email, mobileNumber) VALUES (?, ?, ?, ?, ?)`;
     try {
+      await this.waitForDatabase();
+      const query = `INSERT INTO users (fullName, username, password, email, mobileNumber) VALUES (?, ?, ?, ?, ?)`;
       await this.db.executeSql(query, [user.fullName, user.username, user.password, user.email, user.mobileNumber]);
+      await Storage.set({
+        key: 'loggedInUser',
+        value: JSON.stringify(user) // Serialize the user object before storing it
+      });
       return true; // Registration successful
     } catch (error) {
       console.error('Error registering user:', error);
@@ -78,21 +69,28 @@ export class DatabaseService {
   }
 
   async login(user: User): Promise<boolean> {
-    await this.waitForDatabase();
-    if (!this.db) {
-      console.error('Database is not initialized');
-      return false;
-    }
-    const query = `SELECT * FROM users WHERE username = ? AND password = ?`;
     try {
+      await this.waitForDatabase();
+      const query = `SELECT * FROM users WHERE username = ? AND password = ?`;
       const result = await this.db.executeSql(query, [user.username, user.password]);
-      return result.rows.length > 0; // User found in database
+      const userFound = result.rows.length > 0;
+
+      if (userFound) {
+        await Storage.set({
+          key: 'loggedInUser',
+          value: JSON.stringify(user)
+        });
+        console.log('User logged in successfully');
+      } else {
+        console.log('User not found or invalid credentials');
+      }
+      return userFound;
     } catch (error) {
       console.error('Error logging in:', error);
       return false; // Login failed
     }
   }
-
+  
   private async waitForDatabase(): Promise<void> {
     return new Promise<void>((resolve) => {
       const checkInitialized = () => {
