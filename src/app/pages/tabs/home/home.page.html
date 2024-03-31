@@ -76,7 +76,7 @@
       </ion-item>
     </ion-list>
     <div class="popover">
-      <ion-searchbar [(ngModel)]="searchQuery" (ionInput)="applyFilter()" (click)="showKeyboard()"></ion-searchbar>
+      <ion-searchbar [(ngModel)]="searchQuery"  (click)="showKeyboard()"></ion-searchbar>
     </div>
   </ion-header>
 <ion-content>
@@ -88,6 +88,8 @@
   <ion-grid>
     <ion-item lines="none" color="light">
       <ion-label class="title">Plants-Available</ion-label>
+      <ion-label class="title" slot="end" (click)="addPlants() ">Add Plant</ion-label>
+
     </ion-item>
 
 
@@ -101,7 +103,7 @@
 
     <!-- filter the items -->
     <ion-item>
-      <ion-select label="Filter By Category" placeholder="Category" [(ngModel)]="selectedCategory" (ionChange)="applyCategoryFilter()">
+      <ion-select label="Filter By Category" placeholder="Category" [(ngModel)]="selectedCategory" >
         <ion-select-option value="India">India</ion-select-option>
         <ion-select-option value="China">China</ion-select-option>
         <ion-select-option value="Japan">Japan</ion-select-option>
@@ -121,9 +123,11 @@
           <ion-card-header>
             <ion-card-title>{{ item.name }}</ion-card-title>
             <ion-card-subtitle>₹{{ item.price }}</ion-card-subtitle>
+            <ion-text>{{ item.id}}</ion-text>
+
           </ion-card-header>
           <ion-card-content>
-            <p>{{ item.category}}</p>
+            <p>{{item.description}}</p>
           </ion-card-content>
         </ion-card>
       </ion-col>

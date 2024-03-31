@@ -7,6 +7,7 @@ import { UserAuthService } from 'src/app/services/user-auth/user-auth.service';
 import { Router } from '@angular/router';
 import { DatabaseService } from 'src/app/services/database.service';
 import { Storage } from '@capacitor/storage';
+import { ProductsService } from 'src/app/services/products.service';
 
 @Component({
   selector: 'app-home',
@@ -19,6 +20,7 @@ export class HomePage {
   loggedInUser: any;
   selectedCategory = ''; // Variable to store the selected category
   popularItems: any[] = [];
+  items: any[] = [];
   loadedItemsCount = 0;
   myInput = '';
   searchQuery = ''; // Variable to store the search query
@@ -36,6 +38,8 @@ export class HomePage {
     private route: Router,
     private actionSheetCtrl: ActionSheetController,
     public alertController: AlertController,
+    private navController: NavController,
+    private productsService: ProductsService
     ) {
   }
 
@@ -45,6 +49,7 @@ export class HomePage {
 
   async ngOnInit(): Promise<void> {
 
+    console.log('hey')
     await this.loadLoggedInUser();
 
     if (this.loaderShown) {
@@ -63,6 +68,11 @@ export class HomePage {
       await this.presentToast('Keyboard Will Hide ', 'top');
     });
 
+  }
+
+  addPlants(){
+    console.log('hey')
+    this.navController.navigateForward(['/tabs/add-item']);
   }
 
   async loadLoggedInUser() {
@@ -159,7 +169,7 @@ export class HomePage {
     toast?.onDidDismiss().then(async () => {
       await Keyboard.show();
     });
-    this.applyFilter(); // Apply filter when showing keyboard
+   // this.applyFilter(); // Apply filter when showing keyboard
   }
 
   async presentToast(message: string, position: 'top' | 'middle' | 'bottom') {
@@ -183,25 +193,31 @@ export class HomePage {
   }
 
   async addItems(count: number) {
-    if (!this.moreDataAvailable) return; // Stop adding items if no more data available
-    setTimeout(() => {
-      const newItems = this.apiService.items.slice(this.loadedItemsCount, this.loadedItemsCount + count);
-      if (newItems.length === 0) {
-        this.moreDataAvailable = false; // No more data available
+    try {
+      const items = await this.productsService.getItems(); // Fetch items from the service
+      if (items && items.length > 0) {
+        const newItems = items.slice(this.loadedItemsCount, this.loadedItemsCount + count);
+        if (newItems.length === 0) {
+          this.moreDataAvailable = false; // No more data available
+        }
+        this.popularItems.push(...newItems);
+        this.loadedItemsCount += count;
+        this.loading = false;
+        this.skeleton = false; // Hide skeleton after fetching data
+        this.loaderShown = false; // Set flag to true after loader is shown
+        if (!this.applyingFilter) {
+          this.applyingFilter = true;
+         // this.applyCategoryFilter(); // Apply category filter after loading new items
+         // this.applyFilter(); // Apply search filter after loading new items
+          this.applyingFilter = false;
+        }
       }
-      this.popularItems.push(...newItems);
-      this.loadedItemsCount += count;
-      this.loading = false;
-      this.skeleton = false; // Hide skeleton after fetching data
-      this.loaderShown = false; // Set flag to true after loader is shown
-      if (!this.applyingFilter) {
-        this.applyingFilter = true;
-        this.applyCategoryFilter(); // Apply category filter after loading new items
-        this.applyFilter(); // Apply search filter after loading new items
-        this.applyingFilter = false;
-      }
-    }, 2000);
+    } catch (error) {
+      console.error('Error fetching items:', error);
+      // Handle error loading items
+    }
   }
+
 
   async handleRefresh(event: CustomEvent<RefresherEventDetail>) {
     setTimeout(() => {
@@ -210,51 +226,53 @@ export class HomePage {
     }, 2000);
   }
 
-  applyFilter() {
-    // Apply search filter
-    const searchValue = this.searchQuery.trim().toLowerCase(); // Convert search query to lowercase for case-insensitive matching
-    if (!searchValue || searchValue === '') {
-      this.popularItems = this.apiService.items.slice(0, this.loadedItemsCount);
-      this.applyCategoryFilter();
-    } else {
-      this.popularItems = this.apiService.items.filter(item =>
-        item.name.toLowerCase().includes(searchValue) ||
-        item.price.toString().includes(searchValue) ||
-        item.category.toLowerCase().includes(searchValue)
-      );
-    }
-  };
+  // applyFilter() {
+  //   // Apply search filter
+  //   const searchValue = this.searchQuery.trim().toLowerCase(); // Convert search query to lowercase for case-insensitive matching
+  //   if (!searchValue || searchValue === '') {
+  //     this.popularItems = items.slice(0, this.loadedItemsCount);
+  //     this.applyCategoryFilter();
+  //   } else {
+  //     this.popularItems = items.filter(item =>
+  //       item.name.toLowerCase().includes(searchValue) ||
+  //       item.price.toString().includes(searchValue) ||
+  //       item.category.toLowerCase().includes(searchValue)
+  //     );
+  //   }
+  // };
   
-  applyCategoryFilter() {
-    // Apply category filter
-    const searchValue = this.searchQuery.trim().toLowerCase(); // Convert search query to lowercase for case-insensitive matching
-    if (!this.selectedCategory || this.selectedCategory === 'all') {
-      // If no category selected or 'All' selected, show all items based on search filter
-      this.popularItems = this.apiService.items.slice(0, this.loadedItemsCount);
+  // applyCategoryFilter() {
+  //   // Apply category filter
+  //   const searchValue = this.searchQuery.trim().toLowerCase(); // Convert search query to lowercase for case-insensitive matching
+  //   if (!this.selectedCategory || this.selectedCategory === 'all') {
+  //     // If no category selected or 'All' selected, show all items based on search filter
+  //     this.popularItems = items.slice(0, this.loadedItemsCount);
 
-      this.popularItems = this.popularItems.filter(item =>
-        item.name.toLowerCase().includes(searchValue) ||
-        item.price.toString().includes(searchValue) ||
-        item.category.toLowerCase().includes(searchValue)
-      );
-    } else {
-      // Filter items based only on the selected category
-      this.popularItems = this.apiService.items.filter(item =>
-        item.category.toLowerCase() === this.selectedCategory.toLowerCase()
-      );
-      // Apply search filter within the selected category
-      this.popularItems = this.popularItems.filter(item =>
-        item.name.toLowerCase().includes(searchValue) ||
-        item.price.toString().includes(searchValue) ||
-        item.category.toLowerCase().includes(searchValue)
-      );
-    }
-  }
+  //     this.popularItems = items.filter(item =>
+  //       item.name.toLowerCase().includes(searchValue) ||
+  //       item.price.toString().includes(searchValue) ||
+  //       item.category.toLowerCase().includes(searchValue)
+  //     );
+  //   } else {
+  //     // Filter items based only on the selected category
+  //     this.popularItems = items.filter(item =>
+  //       item.category.toLowerCase() === this.selectedCategory.toLowerCase()
+  //     );
+  //     // Apply search filter within the selected category
+  //     this.popularItems = items.filter(item =>
+  //       item.name.toLowerCase().includes(searchValue) ||
+  //       item.price.toString().includes(searchValue) ||
+  //       item.category.toLowerCase().includes(searchValue)
+  //     );
+  //   }
+  // }
 
   logout(): void {
     this.authService.logout();
     this.route.navigate(['/home']);
   }
+
+ 
 
   onIonInfinite(ev: any) {
     this.addItems(8);
@@ -263,4 +281,3 @@ export class HomePage {
     }, 3000);
   }
 }
-

@@ -1,0 +1,34 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Add New Item</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Form to add a new item -->
+  <ion-list lines="full">
+    <ion-item>
+      <ion-label position="floating">Name</ion-label>
+      <ion-input [(ngModel)]="newItem.name" name="name" type="text" required></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Price</ion-label>
+      <ion-input [(ngModel)]="newItem.price" name="price" type="number" required></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Category</ion-label>
+      <ion-input [(ngModel)]="newItem.category" name="category" type="text" required></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Description</ion-label>
+      <ion-textarea [(ngModel)]="newItem.description" name="description" required></ion-textarea>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Image URL</ion-label>
+      <ion-input [(ngModel)]="newItem.img" name="img" type="url" required></ion-input>
+    </ion-item>
+  </ion-list>
+  
+  <!-- Button to add the new item -->
+  <ion-button expand="block" color="success" (click)="addItem()" [disabled]="!isFormValid()">Add Item</ion-button>
+</ion-content>
