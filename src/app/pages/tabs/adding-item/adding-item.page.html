@@ -1,11 +1,15 @@
-<ion-header>
+<ion-header [translucent]="true">
   <ion-toolbar color="primary">
-    <ion-title>Add New Item</ion-title>
+    <ion-buttons slot="start">
+      <ion-button fill="clear" class="back-button" (click)="goBack()">
+        <ion-icon slot="icon-only" name="arrow-back" color="dark"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ isUpdateMode ? 'Update Item' : 'Add New Item' }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <!-- Form to add a new item -->
+<ion-content [fullscreen]="true">
   <ion-list lines="full">
     <ion-item>
       <ion-label position="floating">Name</ion-label>
@@ -28,7 +32,11 @@
       <ion-input [(ngModel)]="newItem.img" name="img" type="url" required></ion-input>
     </ion-item>
   </ion-list>
-  
-  <!-- Button to add the new item -->
-  <ion-button expand="block" color="success" (click)="addItem()" [disabled]="!isFormValid()">Add Item</ion-button>
+
+  <ion-button expand="block" color="primary" (click)="addItemOrUpdate()">
+    {{ isUpdateMode ? 'Update' : 'Add' }} Item
+  </ion-button>
+
+  <!-- Button to cancel and go back -->
+  <ion-button expand="block" color="danger" (click)="goBack()">Cancel</ion-button>
 </ion-content>

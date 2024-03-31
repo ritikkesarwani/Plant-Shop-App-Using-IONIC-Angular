@@ -88,8 +88,6 @@
   <ion-grid>
     <ion-item lines="none" color="light">
       <ion-label class="title">Plants-Available</ion-label>
-      <ion-label class="title" slot="end" (click)="addPlants() ">Add Plant</ion-label>
-
     </ion-item>
 
 
@@ -118,12 +116,14 @@
     
     <ion-row *ngIf="popularItems.length > 0">
       <ion-col size="6" *ngFor="let item of popularItems">
-        <ion-card routerLink="/tabs/item/{{item.id}}">
-          <ion-img [src]="item.img" style="height: 200px;"></ion-img>
+        <ion-card >
+          <ion-img [src]="item.img" style="height: 200px;" routerLink="/tabs/item/{{item.id}}"></ion-img>
           <ion-card-header>
             <ion-card-title>{{ item.name }}</ion-card-title>
             <ion-card-subtitle>₹{{ item.price }}</ion-card-subtitle>
-            <ion-text>{{ item.id}}</ion-text>
+            <ion-button color="primary" routerLink="/tabs/update/{{item.id}}">Update</ion-button>
+            <ion-icon name="trash-outline" (click)="deleteItem(item.id)"></ion-icon>
+
 
           </ion-card-header>
           <ion-card-content>

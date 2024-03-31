@@ -81,6 +81,20 @@ export class ProductsService {
     }
   }
 
+  async updateItem(item: any): Promise<boolean> {
+    try {
+      await this.waitForDatabase();
+      const query = `UPDATE products SET name = ?, price = ?, category = ?, description = ?, img = ? WHERE id = ?`;
+      await this.db.executeSql(query, [item.name, item.price, item.category, item.description, item.img, item.id]);
+
+      return true; // Update successful
+    } catch (error) {
+      console.error('Error updating item:', error);
+      return false; // Update failed
+    }
+  }
+  
+
   async getItemById(id: number): Promise<any | null> {
     try {
       await this.waitForDatabase();
@@ -97,6 +111,20 @@ export class ProductsService {
       return null; // Error occurred while fetching item by ID
     }
   }
+
+  async deleteItem(itemId: number): Promise<boolean> {
+    try {
+      // Execute a database query to delete the item by ID
+      const query = `DELETE FROM products WHERE id = ?`;
+      await this.db.executeSql(query, [itemId]);
+      return true; // Return true if deletion is successful
+    } catch (error) {
+      console.error('Error deleting item:', error);
+      return false; // Return false if deletion fails
+    }
+  }
+  
+
 
   private async waitForDatabase(): Promise<void> {
     return new Promise<void>((resolve) => {

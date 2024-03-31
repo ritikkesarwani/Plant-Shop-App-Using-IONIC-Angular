@@ -1,4 +1,5 @@
 <!-- wishlist.page.html -->
+
 <ion-header>
   <ion-toolbar>
     <ion-title>Wishlist</ion-title>
@@ -6,10 +7,18 @@
 </ion-header>
 
 <ion-content>
-  <ion-list *ngFor="let item of wishlist | async">
-    <ion-item >
-      <!-- Display wishlist item details -->
-      <img [src]="item?.img" />
+  <ion-list>
+    <ion-item *ngFor="let item of wishlist | async">
+      <ion-thumbnail slot="start">
+        <img [src]="item.img" alt="Plant Image">
+      </ion-thumbnail>
+      <ion-label>
+        <h2>{{ item.name }}</h2>
+        <p>{{ item.description }}</p>
+        <ion-text color="primary">
+          <h3>{{ item.price }}</h3>
+        </ion-text>
+      </ion-label>
     </ion-item>
   </ion-list>
 </ion-content>

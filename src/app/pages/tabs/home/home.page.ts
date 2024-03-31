@@ -33,13 +33,14 @@ export class HomePage {
 
   toastController = inject(ToastController);
 
-  constructor(public apiService: ApiService,
+  constructor(private apiService: ApiService,
     private authService: UserAuthService,
     private route: Router,
     private actionSheetCtrl: ActionSheetController,
     public alertController: AlertController,
     private navController: NavController,
-    private productsService: ProductsService
+    private productsService: ProductsService,
+    private navCtrl: NavController
     ) {
   }
 
@@ -49,6 +50,11 @@ export class HomePage {
 
   async ngOnInit(): Promise<void> {
 
+    this.apiService.itemUpdated$.subscribe(() => {
+      console.log('update item')
+      this.refreshItemList();
+    });
+
     console.log('hey')
     await this.loadLoggedInUser();
 
@@ -56,6 +62,7 @@ export class HomePage {
       this.loading = true; // Show loader only if it hasn't been shown before
       this.skeleton = true;
     }
+    
 
     this.addItems(8);
 
@@ -70,9 +77,31 @@ export class HomePage {
 
   }
 
+  refreshItemList() {
+    // Logic to refresh item list
+    // For example, fetch updated items from the service
+    this.productsService.getItems().then(items => {
+      this.popularItems = items;
+    }).catch(error => {
+      console.error('Error refreshing item list:', error);
+    });
+  }
+
+  async deleteItem(itemId: number): Promise<boolean> {
+    try {
+      // Call your database service method to delete the item by ID
+      const deleted = await this.productsService.deleteItem(itemId);
+      this.refreshItemList();
+      return deleted;
+    } catch (error) {
+      console.error('Error deleting item from database:', error);
+      return false; // Return false if deletion fails
+    }
+  }
+
   addPlants(){
     console.log('hey')
-    this.navController.navigateForward(['/tabs/add-item']);
+    this.route.navigate(['/adding-item'])
   }
 
   async loadLoggedInUser() {
@@ -272,7 +301,14 @@ export class HomePage {
     this.route.navigate(['/home']);
   }
 
- 
+  addItem() {
+    this.navCtrl.navigateForward(['/adding-item']); // Navigate to AddingItemPage for adding a new item
+  }
+
+  updateItem(itemId: number) {
+    this.navCtrl.navigateForward(['/adding-item', itemId]); // Navigate to AddingItemPage with item ID for updating
+  }
+
 
   onIonInfinite(ev: any) {
     this.addItems(8);
