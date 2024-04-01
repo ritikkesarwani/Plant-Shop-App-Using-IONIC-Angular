@@ -53,13 +53,10 @@
           <ion-icon slot="start" name="log-out-outline"></ion-icon>
           <ion-label>Logout</ion-label>
       </ion-item>
-      <!-- <ion-button (click)="presentAlertConfirm()" color="secondary" size="small">
-        <ion-icon slot="start" name="log-out"></ion-icon>
-        <ion-label>Logout</ion-label>
-      </ion-button> -->
     </ion-list>
-    </ion-content>
+</ion-content>
 </ion-menu>
+
 <div class="ion-page" id="main-content">
   <ion-header class="ion-no-border">
     <ion-list lines="none">
@@ -79,27 +76,21 @@
       <ion-searchbar [(ngModel)]="searchQuery"  (click)="showKeyboard()"></ion-searchbar>
     </div>
   </ion-header>
-<ion-content>
 
+<ion-content>
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
-
   <ion-grid>
     <ion-item lines="none" color="light">
       <ion-label class="title">Plants-Available</ion-label>
-    </ion-item>
-
-
+  </ion-item>
     <!-- sort the item -->
     <ion-button (click)="presentActionSheet()" color="secondary" size="small">
       <ion-icon slot="start" name="funnel-outline"></ion-icon>
        <ion-text>Sort by Price</ion-text>
     </ion-button>
-    <!-- <ion-action-sheet trigger="open-action-sheet" header="Actions" [buttons]="actionSheetButtons"></ion-action-sheet> -->
-
-
-    <!-- filter the items -->
+   
     <ion-item>
       <ion-select label="Filter By Category" placeholder="Category" [(ngModel)]="selectedCategory" >
         <ion-select-option value="India">India</ion-select-option>
@@ -109,30 +100,25 @@
       </ion-select>
     </ion-item>
 
-
-
-
-
-    
     <ion-row *ngIf="popularItems.length > 0">
       <ion-col size="6" *ngFor="let item of popularItems">
-        <ion-card >
+        <ion-card>
           <ion-img [src]="item.img" style="height: 200px;" routerLink="/tabs/item/{{item.id}}"></ion-img>
           <ion-card-header>
             <ion-card-title>{{ item.name }}</ion-card-title>
-            <ion-card-subtitle>₹{{ item.price }}</ion-card-subtitle>
-            <ion-button color="primary" routerLink="/tabs/update/{{item.id}}">Update</ion-button>
-            <ion-icon name="trash-outline" (click)="deleteItem(item.id)"></ion-icon>
-
-
+            <ion-card-subtitle>{{ item.category }} &nbsp; &nbsp;  ₹{{ item.price }}</ion-card-subtitle><br>
+            <ion-text>{{item.description}}</ion-text>
+              
+            <div class="icon-group">
+              <ion-icon name="create-outline" color="primary" class="large-icon" routerLink="/tabs/update/{{item.id}}"></ion-icon>
+              <ion-icon name="trash-outline" color="danger" class="large-icon" (click)="deleteItem(item.id)"></ion-icon>
+            </div>
           </ion-card-header>
-          <ion-card-content>
-            <p>{{item.description}}</p>
-          </ion-card-content>
+         
         </ion-card>
       </ion-col>
     </ion-row>
-
+    
     <ion-spinner *ngIf="loading" name="crescent" color="black" class="com"></ion-spinner>
 
     <ion-note *ngIf="!loading && popularItems.length === 0" class="no-item">

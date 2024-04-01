@@ -22,8 +22,16 @@ export class ApiService {
   private itemUpdatedSubject = new BehaviorSubject<void>(undefined);
   itemUpdated$ = this.itemUpdatedSubject.asObservable();
 
+  private itemAddedSubject = new BehaviorSubject<void>(undefined);
+  itemAdded$ = this.itemAddedSubject.asObservable();
+
+
   emitItemUpdated() {
     this.itemUpdatedSubject.next();
+  }
+
+  emitItemAdded(){
+    this.itemAddedSubject.next();
   }
   
   addToWishlist(item: any): void {
