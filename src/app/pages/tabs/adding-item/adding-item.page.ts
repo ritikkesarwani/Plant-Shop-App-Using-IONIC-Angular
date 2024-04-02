@@ -22,15 +22,13 @@ export class AddingItemPage implements OnInit {
     private navCtrl: NavController
   ) { }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   async addItem() {
     try {
-      await this.productsService.insertPlant(this.newItem);
+      const item = await this.productsService.insertPlant(this.newItem);
       console.log('Item added successfully!');
-      // Reset the form after successful insertion
       this.clearForm();
-      // Navigate back to the previous page
       this.navCtrl.back();
     } catch (error) {
       console.error('Error:', error);
@@ -38,7 +36,6 @@ export class AddingItemPage implements OnInit {
   }
 
   clearForm() {
-    // Reset the newItem object to clear the form fields
     this.newItem = {
       name: '',
       price: null,
@@ -49,7 +46,6 @@ export class AddingItemPage implements OnInit {
   }
 
   goBack() {
-    // Navigate back to the previous page
     this.navCtrl.back();
   }
 }

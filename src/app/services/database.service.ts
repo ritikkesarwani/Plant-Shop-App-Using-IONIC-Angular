@@ -18,9 +18,9 @@ export class DatabaseService {
   loggedInUsername: string | null = null; // Property to store the username of the logged-in user
 
   constructor(
-    private sqlite: SQLite, 
+    private sqlite: SQLite,
     private platform: Platform,
-  ) { 
+  ) {
     this.initializeDatabase();
   }
 
@@ -90,7 +90,7 @@ export class DatabaseService {
       return false; // Login failed
     }
   }
-  
+
   private async waitForDatabase(): Promise<void> {
     return new Promise<void>((resolve) => {
       const checkInitialized = () => {

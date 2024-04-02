@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Platform } from '@ionic/angular';
 import { SQLite, SQLiteObject } from '@ionic-native/sqlite/ngx';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { ApiService } from './api/api.service';
+
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +20,7 @@ export class ProductsService {
   constructor(
     private sqlite: SQLite,
     private platform: Platform,
+    private apiService: ApiService
   ) {
     this.initializeDatabase();
   }
@@ -53,7 +57,9 @@ export class ProductsService {
     try {
       await this.waitForDatabase();
       const query = `INSERT INTO products (name, price, category, description, img) VALUES (?, ?, ?, ?, ?)`;
-      await this.db.executeSql(query, [item.name, item.price, item.category, item.description, item.img]);
+      await this.db.executeSql(query, [item.name, item.price, item.category, item.description, item.img]); 4
+      this.apiService.emitItemUpdated();
+
       return true; // Insertion successful
     } catch (error) {
       console.error('Error inserting plant:', error);
@@ -93,7 +99,7 @@ export class ProductsService {
       return false; // Update failed
     }
   }
-  
+
 
   async getItemById(id: number): Promise<any | null> {
     try {
@@ -123,8 +129,55 @@ export class ProductsService {
       return false; // Return false if deletion fails
     }
   }
-  
 
+  async filterData(filterBy: string = '', category: string = ''): Promise<any[]> {
+    try {
+      let query = `SELECT * FROM products`;  // Use the correct table name
+      const params = [];  // Array to store query parameters
+
+      // Build WHERE clause and filter parameters (if filterBy is provided)
+      if (filterBy !== '') {
+        query += ` WHERE (name LIKE ? OR price LIKE ?)`;
+        params.push(`%${filterBy}%`, `%${filterBy}%`);
+      }
+
+      // Add category filter only if a specific category is selected
+      if (category !== '' && category !== 'all') {
+        if (filterBy !== '') {
+          query += ` AND`;
+        } else {
+          query += ` WHERE`;
+        }
+        query += ` category = ?`;
+        params.push(category);
+        console.log(category, 'rr')
+      }
+
+      console.log(query, params);  // Log the final query and parameters for debugging
+
+      console.log('Category:', category);
+      console.log('Final SQL query:', query); // Log the final SQL query for debugging
+      console.log('Query parameters:', params);
+      const response = await this.db.executeSql(query, params);
+      const data = this.extractResponse(response);
+      console.log(data)
+      return data;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  extractResponse(data: any) {
+    let arr = [];
+    if (data.rows.length === 0) {
+      return [];
+    }
+    for (let i = 0; i < data.rows.length; i++) {
+      arr.push(data.rows.item(i));
+    }
+    return arr;
+  }
 
   private async waitForDatabase(): Promise<void> {
     return new Promise<void>((resolve) => {

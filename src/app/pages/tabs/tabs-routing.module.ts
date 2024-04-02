@@ -37,7 +37,7 @@ const routes: Routes = [
   },
   {
     path: 'update/:id',
-    loadChildren: () => import('./update/update.module').then( m => m.UpdatePageModule)
+    loadChildren: () => import('./update/update.module').then(m => m.UpdatePageModule)
   },
 ];
 
@@ -45,4 +45,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class TabsPageRoutingModule {}
+export class TabsPageRoutingModule { }

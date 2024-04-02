@@ -23,7 +23,7 @@ export class UserLoginPage implements OnInit {
     private toastController: ToastController,
     private router: Router,
     private loadingController: LoadingController
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.initializeForm();
@@ -41,7 +41,7 @@ export class UserLoginPage implements OnInit {
       this.loginLoading = true;
       const loading = await this.loadingController.create({
         message: 'Logging in...',
-        duration: 3500
+        duration: 2000
       });
       await loading.present();
 
@@ -60,7 +60,11 @@ export class UserLoginPage implements OnInit {
           const { value } = await Storage.get({ key: 'loggedInUser' });
           if (value) {
             const userData = JSON.parse(value);
-            this.navCtrl.navigateForward(['/tabs']);
+
+            setTimeout(() => {
+              this.navCtrl.navigateForward(['/tabs']);
+            }, 2000)
+
           } else {
             console.error('User data not found in storage');
           }

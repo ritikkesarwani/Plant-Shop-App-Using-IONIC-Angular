@@ -1,11 +1,10 @@
 import { Component, inject } from '@angular/core';
 import { ApiService } from 'src/app/services/api/api.service';
 import { RefresherEventDetail } from '@ionic/core';
-import { InfiniteScrollCustomEvent, NavController, ToastController, IonToast, ActionSheetController, AlertController } from '@ionic/angular';
+import { InfiniteScrollCustomEvent, NavController, ToastController, ActionSheetController, AlertController } from '@ionic/angular';
 import { Keyboard } from '@capacitor/keyboard';
 import { UserAuthService } from 'src/app/services/user-auth/user-auth.service';
 import { Router } from '@angular/router';
-import { DatabaseService } from 'src/app/services/database.service';
 import { Storage } from '@capacitor/storage';
 import { ProductsService } from 'src/app/services/products.service';
 
@@ -17,6 +16,7 @@ import { ProductsService } from 'src/app/services/products.service';
 
 export class HomePage {
 
+  maxLength: number = 20;
   loggedInUser: any;
   selectedCategory = ''; // Variable to store the selected category
   popularItems: any[] = [];
@@ -41,11 +41,11 @@ export class HomePage {
     private navController: NavController,
     private productsService: ProductsService,
     private navCtrl: NavController
-    ) {
+  ) {
   }
 
   ionViewWDidEnter() {
-   
+
   }
 
   async ngOnInit(): Promise<void> {
@@ -61,10 +61,10 @@ export class HomePage {
     if (this.loaderShown) {
       this.loading = true; // Show loader only if it hasn't been shown before
       this.skeleton = true;
+      
     }
-    
 
-    this.addItems(8);
+
 
     Keyboard.addListener('keyboardWillShow', async (info) => {
       console.log('keyboard will show with height:', info.keyboardHeight);
@@ -78,8 +78,7 @@ export class HomePage {
   }
 
   refreshItemList() {
-    // Logic to refresh item list
-    // For example, fetch updated items from the service
+    //refresh
     this.productsService.getItems().then(items => {
       this.popularItems = items;
     }).catch(error => {
@@ -89,17 +88,16 @@ export class HomePage {
 
   async deleteItem(itemId: number): Promise<boolean> {
     try {
-      // Call your database service method to delete the item by ID
       const deleted = await this.productsService.deleteItem(itemId);
       this.refreshItemList();
       return deleted;
     } catch (error) {
       console.error('Error deleting item from database:', error);
-      return false; // Return false if deletion fails
+      return false;
     }
   }
 
-  addPlants(){
+  addPlants() {
     console.log('hey')
     this.route.navigate(['/adding-item'])
   }
@@ -198,7 +196,6 @@ export class HomePage {
     toast?.onDidDismiss().then(async () => {
       await Keyboard.show();
     });
-   // this.applyFilter(); // Apply filter when showing keyboard
   }
 
   async presentToast(message: string, position: 'top' | 'middle' | 'bottom') {
@@ -234,19 +231,18 @@ export class HomePage {
         this.loading = false;
         this.skeleton = false; // Hide skeleton after fetching data
         this.loaderShown = false; // Set flag to true after loader is shown
-        if (!this.applyingFilter) {
-          this.applyingFilter = true;
-         // this.applyCategoryFilter(); // Apply category filter after loading new items
-         // this.applyFilter(); // Apply search filter after loading new items
-          this.applyingFilter = false;
-        }
+        // if (!this.applyingFilter) {
+        //   this.applyingFilter = true;
+        //   // this.applyCategoryFilter(); // Apply category filter after loading new items
+        //   // this.applyFilter(); // Apply search filter after loading new items
+        //   this.applyingFilter = false;
+        // }
       }
     } catch (error) {
       console.error('Error fetching items:', error);
       // Handle error loading items
     }
   }
-
 
   async handleRefresh(event: CustomEvent<RefresherEventDetail>) {
     setTimeout(() => {
@@ -255,6 +251,19 @@ export class HomePage {
     }, 2000);
   }
 
+  async applyFilter() {
+    try {
+      const searchValue = this.searchQuery.trim().toLowerCase(); 
+      const category = this.selectedCategory; 
+
+      console.log(category)
+      const data = await this.productsService.filterData(searchValue, category);
+
+      this.popularItems = data;
+    } catch (error) {
+      console.error('Error fetching filtered data:', error);
+    }
+  }
   // applyFilter() {
   //   // Apply search filter
   //   const searchValue = this.searchQuery.trim().toLowerCase(); // Convert search query to lowercase for case-insensitive matching
@@ -269,7 +278,7 @@ export class HomePage {
   //     );
   //   }
   // };
-  
+
   // applyCategoryFilter() {
   //   // Apply category filter
   //   const searchValue = this.searchQuery.trim().toLowerCase(); // Convert search query to lowercase for case-insensitive matching

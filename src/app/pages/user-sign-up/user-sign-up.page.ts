@@ -79,7 +79,10 @@ export class UserSignUpPage implements OnInit {
 
         const registered = await this.userAuthService.register(user);
         if (registered) {
-          await this.navigateToTabsPage();
+          setTimeout(() => {
+            // Set loading to false once data is fetched
+           this.navigateToTabsPage();
+          }, 2000); 
         } else {
           this.presentToast('Registration failed. Please try again.');
         }

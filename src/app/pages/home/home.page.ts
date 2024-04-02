@@ -9,13 +9,13 @@ import { Router } from '@angular/router';
 })
 export class HomePage {
 
-  constructor(private navCtrl: NavController, private router: Router) {}
+  constructor(private navCtrl: NavController, private router: Router) { }
 
-  loginPage(){
+  loginPage() {
     this.navCtrl.navigateForward(['/user-login']);
   }
 
-  signUpPage(){
+  signUpPage() {
     this.navCtrl.navigateForward(['/user-sign-up']);
   }
 

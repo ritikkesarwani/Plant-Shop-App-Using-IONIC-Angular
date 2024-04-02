@@ -6,23 +6,21 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class ApiService {
 
-  items: any[] = [
-    // Your item data here
-  ];
-
-  private wishlist: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
+  items: any[] = [];
 
   constructor() { }
+
+  private wishlist: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
+  private itemUpdatedSubject = new BehaviorSubject<void>(undefined);
+  private itemAddedSubject = new BehaviorSubject<void>(undefined);
+
 
   getItem(id: any) {
     const item = this.items.find(x => x.id == id);
     return item;
   }
 
-  private itemUpdatedSubject = new BehaviorSubject<void>(undefined);
   itemUpdated$ = this.itemUpdatedSubject.asObservable();
-
-  private itemAddedSubject = new BehaviorSubject<void>(undefined);
   itemAdded$ = this.itemAddedSubject.asObservable();
 
 
@@ -30,10 +28,10 @@ export class ApiService {
     this.itemUpdatedSubject.next();
   }
 
-  emitItemAdded(){
+  emitItemAdded() {
     this.itemAddedSubject.next();
   }
-  
+
   addToWishlist(item: any): void {
     const currentWishlist = this.wishlist.getValue();
     const updatedWishlist = [...currentWishlist, item];

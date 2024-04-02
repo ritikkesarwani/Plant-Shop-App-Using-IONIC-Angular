@@ -4,6 +4,7 @@ import { NavController } from '@ionic/angular';
 import { ApiService } from 'src/app/services/api/api.service';
 import { ProductsService } from 'src/app/services/products.service';
 
+
 @Component({
   selector: 'app-item',
   templateUrl: './item.page.html',

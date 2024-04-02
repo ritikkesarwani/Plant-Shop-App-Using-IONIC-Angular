@@ -61,4 +61,9 @@ export class UpdatePage implements OnInit {
       console.error('Error updating item:', error);
     }
   }
+
+  goBack() {
+    // Navigate back to the previous page
+    this.navCtrl.back();
+  }
 }

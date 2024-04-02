@@ -73,7 +73,7 @@
       </ion-item>
     </ion-list>
     <div class="popover">
-      <ion-searchbar [(ngModel)]="searchQuery"  (click)="showKeyboard()"></ion-searchbar>
+      <ion-searchbar [(ngModel)]="searchQuery" (ionInput)="applyFilter()" (click)="showKeyboard()"></ion-searchbar>
     </div>
   </ion-header>
 
@@ -92,7 +92,7 @@
     </ion-button>
    
     <ion-item>
-      <ion-select label="Filter By Category" placeholder="Category" [(ngModel)]="selectedCategory" >
+      <ion-select label="Filter By Category" placeholder="Category" [(ngModel)]="selectedCategory" (ionChange)="applyFilter()">
         <ion-select-option value="India">India</ion-select-option>
         <ion-select-option value="China">China</ion-select-option>
         <ion-select-option value="Japan">Japan</ion-select-option>
@@ -106,8 +106,10 @@
           <ion-img [src]="item.img" style="height: 200px;" routerLink="/tabs/item/{{item.id}}"></ion-img>
           <ion-card-header>
             <ion-card-title>{{ item.name }}</ion-card-title>
-            <ion-card-subtitle>{{ item.category }} &nbsp; &nbsp;  ₹{{ item.price }}</ion-card-subtitle><br>
-            <ion-text>{{item.description}}</ion-text>
+            <ion-card-subtitle>{{ item.category }} &nbsp; &nbsp;  
+              ₹{{ item.price }}</ion-card-subtitle><br>
+            <ion-text>  {{ item.description.length > maxLength ? (item.description | slice:0:maxLength) + '...' : item.description }}
+            </ion-text>
               
             <div class="icon-group">
               <ion-icon name="create-outline" color="primary" class="large-icon" routerLink="/tabs/update/{{item.id}}"></ion-icon>

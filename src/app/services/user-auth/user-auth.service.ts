@@ -7,19 +7,6 @@ import { User } from 'src/app/Model/User.data';
 })
 export class UserAuthService {
 
-  // constructor() { }
-
-  // login(username: string, password: string): boolean {
-  //   const storedUserData = localStorage.getItem(username);
-  //   if (storedUserData) {
-  //     const userData = JSON.parse(storedUserData);
-  //     if (userData.password === password) {
-  //       return true;
-  //     }
-  //   }
-  //   return false;
-  // }
-
   constructor(private databaseService: DatabaseService) { }
 
   async register(user: User): Promise<boolean> {

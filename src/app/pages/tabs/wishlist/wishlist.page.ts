@@ -9,15 +9,10 @@ import { ApiService } from 'src/app/services/api/api.service';
 })
 export class WishlistPage implements OnInit {
 
-
   constructor(private apiService: ApiService) { }
 
-
-  ngOnInit() {
-    
-  }
+  ngOnInit(): void {}
 
   wishlist = this.apiService.getWishlist();
-
 
 }
